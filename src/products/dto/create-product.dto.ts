@@ -1,0 +1,18 @@
+import { Type } from 'class-transformer';
+import { IsBoolean, IsNumber, IsString, Min } from 'class-validator';
+
+export class CreateProductDto {
+  @IsString()
+  name: string;
+
+  @IsNumber({
+    maxDecimalPlaces: 4,
+  })
+  @Min(0)
+  @Type(() => Number)
+  price: number;
+
+  @IsBoolean()
+  @Type(() => Boolean)
+  available: boolean;
+}
