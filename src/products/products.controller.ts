@@ -13,6 +13,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { PaginationDto } from 'src/common';
 import { PRODUCT_SERVICE } from 'src/config';
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -43,7 +44,7 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateProductDto: any) {
+  update(@Param('id') id: number, @Body() updateProductDto: UpdateProductDto) {
     return this.productServiceClient.send(
       { cmd: 'update_product' },
       { id, ...updateProductDto },
