@@ -25,6 +25,17 @@ const envSchema = z.object({
     .refine((val) => val > 0 && val < 65536, {
       message: 'PRODUCTS_SERVICE_PORT must be between 1 and 65535',
     }),
+  ORDERS_SERVICE_HOST: z.string().nonempty('ORDERS_SERVICE_HOST is required'),
+  ORDERS_SERVICE_PORT: z
+    .string()
+    .nonempty('ORDERS_SERVICE_PORT is required')
+    .transform((val) => parseInt(val, 10))
+    .refine((val) => !Number.isNaN(val), {
+      message: 'ORDERS_SERVICE_PORT must be a valid number',
+    })
+    .refine((val) => val > 0 && val < 65536, {
+      message: 'ORDERS_SERVICE_PORT must be between 1 and 65535',
+    }),
 });
 
 export const envs = envSchema.parse(process.env);
