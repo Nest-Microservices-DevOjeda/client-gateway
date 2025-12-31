@@ -1,2 +1,2 @@
-export const PRODUCT_SERVICE = 'PRODUCT_SERVICE';
-export const ORDER_SERVICE = 'ORDER_SERVICE';
+export const PRODUCT_SERVICE = Symbol('PRODUCT_SERVICE');
+export const ORDER_SERVICE = Symbol('ORDER_SERVICE');
