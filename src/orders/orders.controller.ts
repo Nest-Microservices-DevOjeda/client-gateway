@@ -18,12 +18,12 @@ import { CreateOrderDto, PaginationOrderDto, StatusOrderDto } from './dto';
 export class OrdersController {
   constructor(
     @Inject(ORDER_SERVICE)
-    private readonly ordersServiceClent: ClientProxy,
+    private readonly ordersServiceClient: ClientProxy,
   ) {}
 
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersServiceClent.send(
+    return this.ordersServiceClient.send(
       { cmd: 'create_order' },
       createOrderDto,
     );
@@ -31,7 +31,7 @@ export class OrdersController {
 
   @Get()
   findAll(@Query() paginationOrderDto: PaginationOrderDto) {
-    return this.ordersServiceClent.send(
+    return this.ordersServiceClient.send(
       { cmd: 'find_all_orders' },
       paginationOrderDto,
     );
@@ -39,7 +39,7 @@ export class OrdersController {
 
   @Get(':id')
   findOneById(@Param('id', ParseUUIDPipe) id: string) {
-    return this.ordersServiceClent.send({ cmd: 'find_one_order' }, { id });
+    return this.ordersServiceClient.send({ cmd: 'find_one_order' }, { id });
   }
 
   @Get('status/:status')
@@ -47,7 +47,7 @@ export class OrdersController {
     @Param() StatusOrderDto: StatusOrderDto,
     @Query() paginationDto: PaginationDto,
   ) {
-    return this.ordersServiceClent.send(
+    return this.ordersServiceClient.send(
       { cmd: 'find_all_orders' },
       {
         ...paginationDto,
@@ -61,7 +61,7 @@ export class OrdersController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() statusOrderDto: StatusOrderDto,
   ) {
-    return this.ordersServiceClent.send(
+    return this.ordersServiceClient.send(
       { cmd: 'change_order_status' },
       {
         id,
