@@ -11,41 +11,35 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { PaginationDto } from 'src/common';
-import { PRODUCT_SERVICE } from 'src/config';
+import { NATS_SERVICE } from 'src/config';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
   constructor(
-    @Inject(PRODUCT_SERVICE)
-    private readonly productServiceClient: ClientProxy,
+    @Inject(NATS_SERVICE)
+    private readonly client: ClientProxy,
   ) {}
 
   @Post()
   create(@Body() createProductDto: CreateProductDto) {
-    return this.productServiceClient.send(
-      { cmd: 'create_product' },
-      createProductDto,
-    );
+    return this.client.send({ cmd: 'create_product' }, createProductDto);
   }
 
   @Get()
   findAll(@Query() paginationDto: PaginationDto) {
-    return this.productServiceClient.send(
-      { cmd: 'get_products' },
-      paginationDto,
-    );
+    return this.client.send({ cmd: 'get_products' }, paginationDto);
   }
 
   @Get(':id')
   findOne(@Param('id') id: number) {
-    return this.productServiceClient.send({ cmd: 'get_product' }, { id });
+    return this.client.send({ cmd: 'get_product' }, { id });
   }
 
   @Patch(':id')
   update(@Param('id') id: number, @Body() updateProductDto: UpdateProductDto) {
-    return this.productServiceClient.send(
+    return this.client.send(
       { cmd: 'update_product' },
       { id, ...updateProductDto },
     );
@@ -53,6 +47,6 @@ export class ProductsController {
 
   @Delete(':id')
   remove(@Param('id') id: number) {
-    return this.productServiceClient.send({ cmd: 'delete_product' }, { id });
+    return this.client.send({ cmd: 'delete_product' }, { id });
   }
 }
