@@ -1,84 +1,68 @@
 # ========================================
 # Optimized Multi-Stage Dockerfile
-# Node.js NestJS Application (Using pnpm)
+# NestJS Client Gateway (pnpm)
 # ========================================
 
+# ---------- Base ----------
 FROM node:20-alpine AS base
 
-# Install necessary system dependencies (if any, usually libc6-compat for alpine)
-RUN apk add --no-cache libc6-compat
+# System dependencies (safe for NestJS native deps)
+RUN apk add --no-cache \
+  libc6-compat \
+  python3 \
+  make \
+  g++
 
 # Enable pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Set working directory
 WORKDIR /usr/src/app
 
-# ========================================
-# Dependencies Stage
-# ========================================
+# ---------- Dependencies (prod only) ----------
 FROM base AS deps
 
-# Copy package files
 COPY package.json pnpm-lock.yaml ./
-
-# Install production dependencies
 RUN pnpm install --prod --frozen-lockfile
 
-# ========================================
-# Build Dependencies Stage
-# ========================================
+# ---------- Build dependencies (dev + prod) ----------
 FROM base AS build-deps
 
-# Copy package files
 COPY package.json pnpm-lock.yaml ./
-
-# Install all dependencies (including dev)
 RUN pnpm install --frozen-lockfile
 
-# ========================================
-# Build Stage
-# ========================================
+# ---------- Build ----------
 FROM build-deps AS build
 
-# Copy source files
 COPY . .
-
-# Build the application
 RUN pnpm run build
 
-# ========================================
-# Development Stage
-# ========================================
+# ---------- Development ----------
 FROM build-deps AS development
 
 ENV NODE_ENV=development
 
-# Copy source files
+WORKDIR /usr/src/app
 COPY . .
 
-# Expose port
 EXPOSE 3000
 
-# Start development server
-CMD ["pnpm", "start:dev"]
+# Hot reload
+CMD ["sh", "-c", "pnpm start:dev"]
 
-# ========================================
-# Production Stage
-# ========================================
+# ---------- Production ----------
 FROM base AS production
 
 ENV NODE_ENV=production
 
-# Copy production dependencies from deps stage
+WORKDIR /usr/src/app
+
+# Production deps
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 
-# Copy built application from build stage
+# Built app
 COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/package.json ./
 
-# Expose port
 EXPOSE 3000
 
-# Start production server
-CMD ["node", "dist/main"]
+CMD ["node", "dist/main.js"]
