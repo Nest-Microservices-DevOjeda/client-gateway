@@ -1,5 +1,4 @@
 export * from './constants';
 export * from './dto';
-export * from './interceptors';
-export * from './interfaces';
+export * from './exceptions/rpc-exception.filter';
 export * from './utils';

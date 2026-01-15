@@ -1,7 +1,7 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { RpcToHttpInterceptor } from './common';
+import { RpcToHttpExceptionFilter } from './common';
 import { envs } from './config';
 
 async function bootstrap() {
@@ -16,7 +16,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  app.useGlobalInterceptors(new RpcToHttpInterceptor());
+  app.useGlobalFilters(new RpcToHttpExceptionFilter());
 
   await app.listen(envs.PORT);
   logger.log(`Application is running on port ${envs.PORT}`);
